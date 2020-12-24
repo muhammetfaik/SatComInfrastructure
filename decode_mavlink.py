@@ -7,7 +7,7 @@ import tornado.httputil
 import serial
 from enum import Enum
 from pymavlink import mavlink
-import ConfigParser
+import configparser
 
 
 MAV = mavlink.MAVLink(0)

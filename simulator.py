@@ -7,7 +7,7 @@ import tornado.httputil
 import serial
 from enum import Enum
 from pymavlink import mavlink
-import ConfigParser
+import configparser
 import time
 import random
 
@@ -25,9 +25,9 @@ def printmsg(direction, data):
         pass
     if m is not None:
         for msg in m:
-            print '%s MAV MSG %3d %s' % (direction, msg.get_msgId(), msg.get_type())
+            print ('%s MAV MSG %3d %s' % (direction, msg.get_msgId(), msg.get_type()))
             #if (msg.get_msgId() == 76):
-            print msg
+            print (msg)
 
 
 class IridiumInterface:
@@ -48,7 +48,7 @@ class IridiumInterface:
             try:
                 msg = self.request.arguments['data'][0].decode('hex')
             except:
-                print 'Failed to decode the MT message'
+                print ('Failed to decode the MT message')
                 self.set_status(400)
             else:
                 self.on_msg_callback(msg)
@@ -63,7 +63,7 @@ class IridiumInterface:
 
     def on_message_sent(self, response):
         if response.error:
-            print 'Error sending MO message: %s' % response.error
+            print ('Error sending MO message: %s' % response.error)
 
     def start(self):
         args = dict(cb=self.on_message_callback)
@@ -82,7 +82,7 @@ class SerialInterface:
         try:
             data = self.serial.read(4096)
         except:
-            print 'Failed to read from serial. Device disconnected?'
+            print ('Failed to read from serial. Device disconnected?')
             self.close()
             tornado.ioloop.IOLoop.current().call_later(1, self.open)
         else:
@@ -92,19 +92,19 @@ class SerialInterface:
         self.serial.write(data)
 
     def open(self):
-        print 'Opening serial port %s @ %d...' % (self.port, self.baud)
+        print ('Opening serial port %s @ %d...' % (self.port, self.baud))
         try:
             self.serial = serial.Serial(port=self.port, baudrate=self.baud)
             self.serial.timeout = 0
             tornado.ioloop.IOLoop.current().add_handler(self.serial.fileno(), self.on_receive, tornado.ioloop.IOLoop.READ)
         except:
-            print 'Cannot open port, retrying...'
+            print ('Cannot open port, retrying...')
             tornado.ioloop.IOLoop.current().call_later(1, self.open)
         else:
-            print 'Port opened'
+            print ('Port opened')
 
     def close(self):
-        print 'Closing serial port'
+        print ('Closing serial port')
         tornado.ioloop.IOLoop.current().remove_handler(self.serial.fileno())
         self.serial.close()
         self.serial = None
@@ -156,8 +156,8 @@ class IridiumSimulator:
                     else:
                         self.sendSerial('2')
                         self.sendOK()
-                        print 'CHECKSUM ERROR!'
-                        print 'len', len(self.mo_buffer)
+                        print ('CHECKSUM ERROR!')
+                        print ('len', len(self.mo_buffer))
                         # tornado.ioloop.IOLoop.current().stop()
                     self.changeState(ATstate.idle)
             else:
@@ -236,7 +236,7 @@ class IridiumSimulator:
         try:
             self.mo_length = int(length)
         except:
-            print 'SBDWB FAIL'
+            print ('SBDWB FAIL')
             self.sendSerial('3')
         else:
             self.mo_buffer = ''
@@ -297,16 +297,16 @@ class IridiumSimulator:
 
 def main():
     config_file = 'simulator.cfg'
-    config = ConfigParser.RawConfigParser()
+    config = configparser.RawConfigParser()
     try:
         config.read(config_file)
         iridium_url = config.get('iridium', 'url')
         iridium_local_port = config.getint('iridium', 'local_port')
         serial_port = config.get('serial', 'port')
         serial_baudrate = config.getint('serial', 'baudrate')
-    except ConfigParser.Error as e:
-        print 'Error reading configuration file %s:' % config_file
-        print e
+    except configparser.Error as e:
+        print ('Error reading configuration file %s:' % config_file)
+        print (e)
         quit()
 
     IridiumSimulator(iridium_url, iridium_local_port, serial_port, serial_baudrate)

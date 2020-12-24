@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import ConfigParser
+import configparser
 import logging
 import paho.mqtt.client as mqtt
 import socket
@@ -162,9 +162,9 @@ class MqttInterface(object):
 
 def main():
     config_file = 'udp2mqtt.cfg'
-    config = ConfigParser.RawConfigParser()
+    config = configparser.RawConfigParser()
     credentials_file = 'credentials.cfg'
-    credentials = ConfigParser.RawConfigParser()
+    credentials = configparser.RawConfigParser()
     try:
         config.read(config_file)
         credentials.read(credentials_file)
@@ -176,7 +176,7 @@ def main():
         lte_tx_port = config.getint('lte', 'listening_port')
         satcom_rx_port = config.getint('satcom', 'target_port')
         satcom_tx_port = config.getint('satcom', 'listening_port')
-    except ConfigParser.Error as e:
+    except configparser.Error as e:
         print('Error reading configuration files ' + config_file + ' and ' + credentials_file + ':')
         print(e)
         quit()

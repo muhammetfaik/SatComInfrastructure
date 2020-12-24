@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import ConfigParser
+import configparser
 import logging
 import paho.mqtt.client as mqtt
 import socket
@@ -265,9 +265,9 @@ class MqttInterface(object):
 
 def main():
     config_file = 'relay.cfg'
-    config = ConfigParser.RawConfigParser()
+    config = configparser.RawConfigParser()
     credentials_file = 'credentials.cfg'
-    credentials = ConfigParser.RawConfigParser()
+    credentials = configparser.RawConfigParser()
     rock7_credentials = {}
     try:
         config.read(config_file)
@@ -285,7 +285,7 @@ def main():
         rock7_credentials['username'] = credentials.get('rockblock', 'username')
         rock7_credentials['password'] = credentials.get('rockblock', 'password')
 
-    except ConfigParser.Error as e:
+    except configparser.Error as e:
         print('Error reading configuration files ' + config_file + ' and ' + credentials_file + ':')
         print(e)
         quit()
